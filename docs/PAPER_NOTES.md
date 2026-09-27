@@ -1,6 +1,6 @@
 # Paper notes — literature to an independent implementation
 
-Prepared before implementation, 2026-09-27. These are AI-assisted reading notes;
+Prepared during project development on 2026-09-27. These are AI-assisted reading notes;
 the portfolio owner should verify and explain them independently.
 
 Lago, J., Marcjasz, G., De Schutter, B., & Weron, R. (2021).
@@ -11,7 +11,7 @@ best practices and an open-access benchmark*. Applied Energy, 293, 116983.
 [Preprint](https://arxiv.org/abs/2008.08004).
 The published PDF is CC BY 4.0; these notes paraphrase it and do not reproduce its tables.
 Section references below refer to the published article, not the preprint.
-No epftoolbox source or other forecasting repository was consulted to implement this project.
+No third-party forecasting repository source code was intentionally used as an implementation reference or copied during this project.
 
 ## Problem and market timing (Sections 1–3)
 

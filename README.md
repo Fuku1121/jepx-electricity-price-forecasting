@@ -54,8 +54,7 @@ best practices and an open-access benchmark*. Applied Energy, 293, 116983.
 [published author-hosted PDF](https://jesuslago.com/wp-content/uploads/1-s2.0-S0306261921004529-main-1.pdf).
 
 Read [Paper notes](docs/PAPER_NOTES.md) for section references and explicit
-**Paper / This implementation** distinctions. No epftoolbox or other forecasting
-repository source code was consulted or copied. scikit-learn supplies the optimizer;
+**Paper / This implementation** distinctions. No third-party forecasting repository source code was intentionally used as an implementation reference or copied during this project. scikit-learn supplies the optimizer;
 data handling, feature design, evaluation and reporting are implemented here.
 
 ## What I implemented
