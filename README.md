@@ -1,5 +1,12 @@
 # JEPX Electricity Price Forecasting from Academic Literature
 
+**Two-stage research portfolio:** Stage 1 — JEPX electricity price forecasting;
+Stage 2 — forecast-driven battery scheduling and optimization.
+The unchanged forecasts now feed a constrained MILP, followed by actual-price
+out-of-sample valuation. [Battery method](docs/BATTERY_OPTIMIZATION.md) ·
+[Executed battery results](docs/BATTERY_RESULTS.md).
+
+
 [日本語](README.ja.md) · [Methodology](docs/METHODOLOGY.md) · [Results](docs/RESULTS.md) · [Paper notes](docs/PAPER_NOTES.md)
 
 [![Tests](https://github.com/Fuku1121/jepx-electricity-price-forecasting/actions/workflows/tests.yml/badge.svg)](https://github.com/Fuku1121/jepx-electricity-price-forecasting/actions/workflows/tests.yml)
@@ -147,6 +154,52 @@ The shaded error band is a descriptive 10th–90th percentile range, not a confi
 | Several fixed calibration windows and ensembles | One daily expanding window; optional rolling window |
 | LEAR and DNN benchmarks, two-year tests, DM/GW comparisons | LASSO and naive models, one-year test, descriptive comparisons |
 
+## Battery optimization
+
+**Research question:** does LEAR-driven battery scheduling improve realized proxy
+revenue over the strongest existing naive forecast, under identical constraints?
+This decision layer reuses Stage 1 forecasts without changing model, split or results.
+
+**Hypothetical research battery:** 1 MWh nameplate, 0.5 MW charge/discharge,
+10–90% SOC, fixed 50% start/end each day, 95% efficiency each way (90.25% round trip).
+This user-proposed teaching case makes units and loss/energy constraints explicit;
+it is not a fitted real installation. The base case has zero degradation cost.
+
+**Optimization:** a SciPy/HiGHS MILP maximizes forecast price × net discharge energy
+minus optional grid-side throughput cost. It enforces SOC dynamics, capacity/output
+bounds and a binary charge/discharge state. MW × 0.5 h × 1000 converts to kWh.
+Plans use forecasts only and are frozen before actual-price settlement; the oracle
+has a separate function. A failed solver raises, rather than silently producing results.
+
+**Backtest:** all 365 original test days (2024-04-01–2025-03-31), 48 slots/day.
+No-operation, previous-day naive, LEAR, and the explicitly infeasible oracle share
+battery conditions. Naive was chosen from the existing Stage 1 MAE ranking at the
+user's request; no battery-return selection or test-period battery tuning was done.
+
+| Strategy | Annual proxy net revenue (JPY) | Negative days |
+|---|---:|---:|
+| No-operation | 0 | 0 |
+| Naive forecast optimization | 2,233,270 | 8 |
+| LEAR forecast optimization | 2,532,089 | 2 |
+| Perfect-foresight upper bound | 2,899,726 | 0 |
+
+LEAR exceeds Naive by **298,819 JPY (+13.38%)** in the base case, but earns less on
+**112 days**. On **43 days**, its MAE is lower yet its revenue is also lower.
+**Lower forecast error does not automatically imply higher operational value.**
+Six predeclared cases (base, RTE 80/90/95%, throughput cost 1/3 JPY/kWh) are all
+reported in [Battery results](docs/BATTERY_RESULTS.md), including losses.
+
+![Cumulative battery proxy revenue](results/battery/figures/cumulative_revenue.png)
+
+This is a **JEPX system-price research proxy**; an actual battery may settle on area prices or different contracts. Grid fees, imbalance costs, market impact, bid acceptance, transmission constraints, capex and fixed operating costs are omitted. All planned volumes are assumed executable. Degradation is only a hypothetical linear throughput charge, not a lifetime model. Battery parameters are hypothetical. Perfect foresight is infeasible in practice. These revenues do **not** demonstrate commercial operation or profitability.
+
+See [equations, assumptions and reproduction](docs/BATTERY_OPTIMIZATION.md).
+After preparing the full Stage 1 prediction file, run:
+
+```bash
+python scripts/run_battery_backtest.py --predictions results/predictions_full.csv
+```
+
 ## What I learned
 
 The implemented checks illustrate why delivery time and information availability must
@@ -206,7 +259,8 @@ holidays, robust target transformations, uncertainty estimates and significance 
 are absent. Expanding history can preserve outdated regimes. Shared alpha simplifies
 slot-specific tuning. Archive revisions and original release timing are not reconstructed.
 System price is not automatically an area's executable battery settlement price.
-See the [battery optimization design](docs/FUTURE_WORK.md); it has not been implemented.
+Stage 2 now implements the [battery scheduling experiment](docs/BATTERY_OPTIMIZATION.md);
+[remaining future work](docs/FUTURE_WORK.md) concerns execution realism and uncertainty.
 
 ## AI assistance
 
@@ -220,4 +274,4 @@ by the paper authors or JEPX.
 
 Original code and documentation: [MIT](LICENSE). JEPX source data and the cited
 paper retain their own rights. See [pre-publication review](docs/RELEASE_REVIEW.md)
-for data exclusions and provenance checks. The test badge links to the current hosted CI status.
+for data exclusions and provenance checks. The Tests link leads to the current hosted CI status.

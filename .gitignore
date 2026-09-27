@@ -20,3 +20,6 @@ results/smoke/
 **/predictions_full.csv
 **/coefficients_full.csv
 results/rolling_local/
+
+results/battery/battery_schedules_full.csv
+results/stage1_reproduction/

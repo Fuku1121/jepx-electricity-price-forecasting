@@ -5,7 +5,9 @@
 - [Paper notes](PAPER_NOTES.md): literature interpretation and Paper / This implementation decisions.
 - [Methodology](METHODOLOGY.md): forecast timing, features, chronology and leakage prevention.
 - [Results](RESULTS.md): executed results, every baseline comparison, failure cases and verification.
-- [Future work](FUTURE_WORK.md): battery optimization design; not implemented.
+- [Battery optimization](BATTERY_OPTIMIZATION.md): Stage 2 formulation, leakage boundary and reproduction.
+- [Battery results](BATTERY_RESULTS.md): executed cashflows, downside and every sensitivity case.
+- [Future work](FUTURE_WORK.md): remaining execution and uncertainty questions.
 - [Release review](RELEASE_REVIEW.md): data exclusions, provenance and publication checks.
 
 ## Japanese study materials

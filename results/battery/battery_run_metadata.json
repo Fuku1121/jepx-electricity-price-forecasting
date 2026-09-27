@@ -1,0 +1,53 @@
+{
+  "status": "executed_on_frozen_stage1_predictions",
+  "created_utc": "2026-09-27T14:37:28.310451+00:00",
+  "elapsed_seconds": 99.10190940008033,
+  "test_start": "2024-04-01",
+  "test_end": "2025-03-31",
+  "days": 365,
+  "slots_per_day": 48,
+  "stage1_commit": "c61d6770389e88556f72a1bbc44acd3d5e3264b5",
+  "predictions_sha256": "1cb21a1f7b505f9a309ae54c00212b7436d5d6fa829ba45e3db00cd1332dcaea",
+  "stage1_metrics_sha256": "3ce86564b96d84b6bf4690c23126e796a8e114012b7fb9cdaf958cae70a56dae",
+  "plan_sha256": "7d0126ee83991ae15d476bd9711ec71639b78d820fbecee3bf50b760e134e162",
+  "source_sha256": {
+    "battery.py": "d7501a2fecc72247f6b59248cf7ed0c9915cee6e3cb2864fde7bfa6b615aaf37",
+    "optimization.py": "56dd5d02dc82ce15e0b8acc9314e0d5127b3dc83710e878fff5680fd72ce8891",
+    "backtest.py": "307ee88d04bc9e5275ba3b740f52864bc61d56c964c77a4a62865ef8d11a28c7",
+    "run_battery_backtest.py": "a21a4ff820418e2aae307318e8e90a4fef4c89f98341358d8fe32790c3065de8",
+    "battery_experiment.json": "7d0126ee83991ae15d476bd9711ec71639b78d820fbecee3bf50b760e134e162"
+  },
+  "python": "3.12.14",
+  "versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2"
+  },
+  "solver": "scipy.optimize.milp / HiGHS",
+  "solver_time_limit_seconds": 60,
+  "mip_rel_gap": 1e-09,
+  "maximum_observed_gap": 1.2101684952858983e-14,
+  "solver_failures": 0,
+  "operational_forecast_only": true,
+  "initial_and_terminal_soc_equal_each_day": true,
+  "degradation_basis": "grid-side charge plus discharge kWh",
+  "round_trip_base": 0.9025,
+  "interpretation": "Hypothetical system-price proxy, not commercial profit; perfect foresight is an infeasible upper bound",
+  "baseline_selection": "Existing Stage 1 test-MAE ranking at user request; not battery-return selection",
+  "data_source": "JEPX official system prices; original data rights remain with JEPX",
+  "artifacts_sha256": {
+    "battery_config.json": "e488b430f3262c8c4ee4af48eb5e9ce712257b5f83e18117b71499c878d3e5d8",
+    "battery_schedules_sample.csv": "53a8d2e0adf19d6f60348403e0b62bb3ae01f7683831755178edab5a71a2ac77",
+    "daily_revenue.csv": "5dbbd76b7a46b0bd87d8b8dceab4e424140aac1d3d89162e98174ea211416b87",
+    "monthly_revenue.csv": "f75f884827dbdcb91c42cd52ce1bf54a83df27df8f79055c1588c78871f3f30f",
+    "sensitivity_daily_revenue.csv": "d0ad6d4621e31dbcfbd3131897aa501bcff5a59e05321ac0350f9e49c770266d",
+    "sensitivity_metrics.csv": "d4e529b744152c4ea82737f53877429504500997d144f0a92c3f4c5fcf1e3dbd",
+    "strategy_metrics.csv": "a6d97dfeacf3f764a33c9d3902cb63245825a723223cc6cdd235a31f484f4f70",
+    "figures/cumulative_revenue.png": "f5c89d0bb4d4ebcce179057abef61e33a0a7002c5a542e7d7f7ebfc6bf0cdb26",
+    "figures/daily_revenue.png": "b2870dedff5643dc0f56d58947f925bf00e2608fc65542a77de3455fefd26655",
+    "figures/sample_battery_schedule.png": "e0009467f6d35daca953ff50b3298c54f4e61b9be34114dddbb55fddf1b10946",
+    "figures/soc_example.png": "db0930159b9983af123fbf3a11152fe86afa0e23cd21f5ed8ec77b3adf63d847",
+    "figures/strategy_revenue_comparison.png": "9920d11d7b203e8d48cb7fc38854049be742f368928611cf765e30d799df48ec"
+  }
+}

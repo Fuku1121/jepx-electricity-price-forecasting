@@ -1,5 +1,7 @@
 # 最終報告（日本語）
 
+> 本文はStage 1の納品時点の記録です。現在は [Stage 2：蓄電池最適化](BATTERY_OPTIMIZATION.md) と [結果](BATTERY_RESULTS.md) を追加しています。
+
 ## 1. 論文の要点
 
 Lago et al. (2021) は、短いテスト期間・弱い比較対象・不適切な指標などによって
