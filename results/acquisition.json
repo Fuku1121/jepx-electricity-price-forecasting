@@ -1,0 +1,36 @@
+[
+  {
+    "file": "spot_summary_2022.csv",
+    "sha256": "2727b29b48154c7a4252229e3dacdbfc98616f38a1469ec821168f7fdb1be8d1",
+    "retrieved_utc": "2026-09-27T04:30:09.945631+00:00",
+    "endpoint": "https://www.jepx.jp/_download.php",
+    "method": "POST",
+    "form": {
+      "dir": "spot_summary",
+      "file": "spot_summary_2022.csv"
+    },
+    "retrieval_note": "First CSV fetched earlier in this session; timestamp records saving the already downloaded bytes into data/raw."
+  },
+  {
+    "file": "spot_summary_2023.csv",
+    "sha256": "443b7126f4fb2676e32e840327c8ae8d774046bec23a36823a716787936adf3d",
+    "retrieved_utc": "2026-09-27T04:30:14.667306+00:00",
+    "endpoint": "https://www.jepx.jp/_download.php",
+    "method": "POST",
+    "form": {
+      "dir": "spot_summary",
+      "file": "spot_summary_2023.csv"
+    }
+  },
+  {
+    "file": "spot_summary_2024.csv",
+    "sha256": "b3131192a4de3e43a6e2fd4f11f26aec2129de2764cdd423d937ca1d4389cd07",
+    "retrieved_utc": "2026-09-27T04:30:19.294265+00:00",
+    "endpoint": "https://www.jepx.jp/_download.php",
+    "method": "POST",
+    "form": {
+      "dir": "spot_summary",
+      "file": "spot_summary_2024.csv"
+    }
+  }
+]

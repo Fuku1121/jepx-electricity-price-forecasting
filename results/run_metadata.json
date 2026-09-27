@@ -1,0 +1,86 @@
+{
+  "status": "executed_on_official_JEPX_CSV",
+  "created_utc": "2026-09-27T04:41:37.203135+00:00",
+  "target": "JEPX system price",
+  "unit": "JPY/kWh",
+  "timezone": "Asia/Tokyo",
+  "config": {
+    "validation_start": "2024-01-01",
+    "test_start": "2024-04-01",
+    "test_end": "2025-03-31",
+    "alphas": [
+      0.03,
+      0.1,
+      0.3,
+      1.0
+    ],
+    "min_train_days": 56,
+    "window_days": null
+  },
+  "selected_alpha": 0.1,
+  "data_start": "2022-04-01",
+  "data_end": "2025-03-31",
+  "data_days": 1096,
+  "data_observations": 52608,
+  "initial_training_days": 633,
+  "validation_days": 91,
+  "test_days": 365,
+  "feature_count": 247,
+  "elapsed_seconds": 429.4054109000135,
+  "files": [
+    {
+      "file": "spot_summary_2022.csv",
+      "sha256": "2727b29b48154c7a4252229e3dacdbfc98616f38a1469ec821168f7fdb1be8d1",
+      "bytes": 2321838,
+      "rows": 17520,
+      "source": "https://www.jepx.jp/electricpower/market-data/spot/"
+    },
+    {
+      "file": "spot_summary_2023.csv",
+      "sha256": "443b7126f4fb2676e32e840327c8ae8d774046bec23a36823a716787936adf3d",
+      "bytes": 2269546,
+      "rows": 17568,
+      "source": "https://www.jepx.jp/electricpower/market-data/spot/"
+    },
+    {
+      "file": "spot_summary_2024.csv",
+      "sha256": "b3131192a4de3e43a6e2fd4f11f26aec2129de2764cdd423d937ca1d4389cd07",
+      "bytes": 2287176,
+      "rows": 17520,
+      "source": "https://www.jepx.jp/electricpower/market-data/spot/"
+    }
+  ],
+  "source_sha256": {
+    "__init__.py": "245f9ad8d98a542f7888896200903b61298954a6ab3aece6e87d4f9f05622458",
+    "baseline.py": "49f0dec34e405f111b4b7d301c80322142da525acf68735b28f9b4ed7203e939",
+    "data.py": "7d88e86c2885932a810568c3c2d61a38c24a089695c5b74297059b4d0a86cae7",
+    "features.py": "0038f8c7fcd98255dc67cf6f368e30a25284336fe4aafad024721652ea302c12",
+    "lear.py": "5102f28793b2dc5f733b363cd93005852aa0463f9fa2dbf558d47b24705b29d9",
+    "metrics.py": "8a7861378e4d3ddae4e0c1ca96c528a4379982ba1d2b0c2a6a8a503197c3cfe5",
+    "pipeline.py": "f9ee7b698501ae45f11caff442b2637f74ed09dc4e0d083cf9854b421671ae8c",
+    "splits.py": "673ec088f375dd0f4310ce83207b2b22a6dc00d5538cd228394995ad715893e3"
+  },
+  "python": "3.12.14",
+  "versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "matplotlib": "3.11.2"
+  },
+  "assumptions": [
+    "d-1 complete auction curve available before d auction",
+    "final historical CSV revisions not publication-time snapshots"
+  ],
+  "inference": "descriptive comparison only; no statistical significance or profitability claim",
+  "source_sha256_note": "Hashes of original working-file bytes at execution; Git newline normalization may change bytes without changing code.",
+  "git_normalized_source_sha256": {
+    "__init__.py": "245f9ad8d98a542f7888896200903b61298954a6ab3aece6e87d4f9f05622458",
+    "baseline.py": "49f0dec34e405f111b4b7d301c80322142da525acf68735b28f9b4ed7203e939",
+    "data.py": "7d88e86c2885932a810568c3c2d61a38c24a089695c5b74297059b4d0a86cae7",
+    "features.py": "0038f8c7fcd98255dc67cf6f368e30a25284336fe4aafad024721652ea302c12",
+    "lear.py": "5102f28793b2dc5f733b363cd93005852aa0463f9fa2dbf558d47b24705b29d9",
+    "metrics.py": "8a7861378e4d3ddae4e0c1ca96c528a4379982ba1d2b0c2a6a8a503197c3cfe5",
+    "pipeline.py": "8da48a3e8e76529e8bee91254436736c1fba818b9006714ffefa7624e9bfc0a0",
+    "splits.py": "673ec088f375dd0f4310ce83207b2b22a6dc00d5538cd228394995ad715893e3"
+  }
+}
