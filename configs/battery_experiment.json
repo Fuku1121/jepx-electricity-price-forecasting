@@ -1,0 +1,31 @@
+{
+  "design_frozen_before_battery_results": true,
+  "stage1_commit": "c61d6770389e88556f72a1bbc44acd3d5e3264b5",
+  "test_start": "2024-04-01",
+  "test_end": "2025-03-31",
+  "naive_model": "naive_previous_day",
+  "base": {
+    "capacity_mwh": 1.0,
+    "charge_power_mw": 0.5,
+    "discharge_power_mw": 0.5,
+    "initial_soc_fraction": 0.5,
+    "min_soc_fraction": 0.1,
+    "max_soc_fraction": 0.9,
+    "charge_efficiency": 0.95,
+    "discharge_efficiency": 0.95,
+    "degradation_jpy_per_kwh": 0.0
+  },
+  "sensitivity": {
+    "round_trip_efficiency": [
+      0.8,
+      0.9,
+      0.95
+    ],
+    "degradation_jpy_per_kwh": [
+      1.0,
+      3.0
+    ]
+  },
+  "cost_definition": "JPY per grid-side charged plus discharged kWh; included in both objective and evaluation",
+  "selection": "All scenarios reported, no test-period selection; baseline requested from existing Stage 1 ranking."
+}

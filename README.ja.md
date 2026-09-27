@@ -1,5 +1,9 @@
 # 論文に基づくJEPX電力価格予測
 
+**2段階の研究ポートフォリオです。** Stage 1はJEPX価格予測、Stage 2はその予測を使う蓄電池の充放電最適化です。予測をMILPへ入力し、制約を満たす計画を固定してから、実価格でout-of-sample評価します。
+[蓄電池の数式・設計](docs/BATTERY_OPTIMIZATION.md) ／ [実行済み結果](docs/BATTERY_RESULTS.md)
+
+
 [English](README.md) · [実験方法](docs/METHODOLOGY.md) · [詳細な結果](docs/RESULTS.md) · [論文ノート](docs/PAPER_NOTES.md)
 
 Lago et al. (2021) の電力価格予測研究を読み、日本のJEPXスポット市場に
@@ -60,7 +64,7 @@ scikit-learnの最適化器を利用しています。
 外生変数や頑健変換、ensemble、DM/GW検定は実装していません。
 
 次の研究課題は、入札時点で利用できた需要・再エネ予測を追加し、別の未使用年で再評価することです。
-[蓄電池運用最適化への拡張](docs/FUTURE_WORK.md) は設計のみで、実装・収益実験は未実施です。
+[蓄電池運用最適化](docs/BATTERY_OPTIMIZATION.md) はStage 2として実装・評価済みです。実市場の約定・費用・不確実性への対応は [今後の課題](docs/FUTURE_WORK.md) です。
 
 ## 再現とレビュー
 
@@ -90,3 +94,42 @@ Codexを論文の解釈支援、実装、レビュー、テスト、文書作成
 本人がすべて独力で作成したという意味ではありません。解釈・設計・結論の確認は著者の責任です。
 
 独自のコード・文書は[MIT](LICENSE)。JEPXデータと引用論文の権利はそれぞれの権利者に帰属します。
+
+## 蓄電池の充放電最適化
+
+**研究の問い：** 同じ電池条件で、LEARの予測から作る計画は、既存の最良naive予測から作る計画より実現代理収益を改善するか。
+既存の予測値、期間分割、alpha、モデル、Stage 1の結果は変更していません。
+
+**Hypothetical research battery：** 容量1 MWh、充放電各0.5 MW、SOC 10〜90%、日初・日末50%、充電効率95%・放電効率95%（往復90.25%）。
+単位を理解しやすい規模、容量の上下余裕、対称な初期状態、変換損失を説明するための仮想設定で、実在設備の模倣ではありません。
+
+**数理最適化：** SciPy/HiGHSのMILPで、予測価格による売買差額からthroughput費用を引いた目的関数を最大化します。SOC更新、出力・容量上限、日末SOC固定、binary変数による同時充放電禁止を入れます。
+MW × 0.5時間 × 1000 = kWhとして計算します。標準ケースは劣化費用0です。
+
+**バックテスト：** 2024-04-01〜2025-03-31の365日・1日48コマ。
+運用停止、前日naive予測、LEAR予測、Perfect-foresight upper boundを同じ条件で比較します。
+前日naiveは既存Stage 1のtest MAE順位に基づく指定であり、新しい未使用データによるモデル選択ではありません。
+予測だけで計画を固定し、その後に実価格で評価します。未来実価格を最適化に渡すのは、実行不可能な上限benchmarkだけです。
+
+| Strategy | Annual proxy net revenue (JPY) | Negative days |
+|---|---:|---:|
+| No-operation | 0 | 0 |
+| Naive forecast optimization | 2,233,270 | 8 |
+| LEAR forecast optimization | 2,532,089 | 2 |
+| Perfect-foresight upper bound | 2,899,726 | 0 |
+
+標準条件ではLEARがNaiveを **298,819円（13.38%）** 上回りました。ただし日次収益では **112日** 下回り、うち **43日** はMAEが良くても収益が低い日です。
+**Lower forecast error does not automatically imply higher operational value.**
+予測誤差の改善がそのまま運用価値の改善を保証するわけではありません。損失日も隠さず、事前固定した往復効率80・90・95%、throughput費用1・3円/kWhの全感度結果を掲載しています。
+
+JEPX system priceを用いた**研究用proxy**です。実設備はarea priceや別契約で決済される可能性があります。grid fees（系統料金）、imbalance costs、market impact、bid acceptance、transmission constraints、設備投資・固定運転費を考慮せず、全計画量の約定を仮定します。劣化コストは仮想の線形throughput費用で、寿命モデルではありません。電池条件も仮想設定です。Perfect foresightは実行不可能であり、この収益は商用運用・利益の証明ではありません。
+
+[実行済み結果・失敗日・全感度分析](docs/BATTERY_RESULTS.md) ／ [数式と再現手順](docs/BATTERY_OPTIMIZATION.md)
+
+```bash
+python scripts/run_battery_backtest.py --predictions results/predictions_full.csv
+python -m pytest -q
+```
+
+full予測ファイルはGit管理外です。新規cloneでは上記再現手順に従い、Stage 1の再計算先を別ディレクトリにして既存結果を保護してください。
+Stage 2もAI支援による実装・検証・文書作成です。本人が内容を確認し、自分の言葉で説明する責任があります。

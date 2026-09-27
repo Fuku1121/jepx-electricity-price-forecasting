@@ -1,4 +1,4 @@
-# Publication review
+# Stage 1 publication review
 
 Reviewed locally on 2026-09-27; documentation refined for public review.
 Repository: [Fuku1121/jepx-electricity-price-forecasting](https://github.com/Fuku1121/jepx-electricity-price-forecasting).
@@ -65,3 +65,24 @@ figures and test expectations are unchanged by this documentation review.
 Run commands and exact numerical evidence are documented in the README and results
 metadata. Review the public Actions run after publishing; local checks cannot
 substitute for a claim that hosted CI actually ran.
+
+
+## Stage 2 extension review
+
+The historical review above describes the Stage 1 publication and metadata correction.
+Stage 2 adds a forecast-driven battery MILP and backtest without changing any original
+forecasting module, test expectation or Stage 1 result artifact. Its method and executed
+results are in [Battery optimization](BATTERY_OPTIMIZATION.md) and
+[Battery results](BATTERY_RESULTS.md). All six predeclared battery scenarios are reported;
+there is no test-return-based parameter selection or new forecasting model.
+
+The local suite now contains 52 passing cases, including the original 25. Battery tests
+cover physical constraints, binary exclusivity, unit conversion, solver failures,
+forecast/actual separation and an actual-price mutation test. Full base schedules were
+independently audited and daily cashflows recomputed. CI evidence must be checked on
+the published branch/merge commit in Actions; this text does not substitute for it.
+
+Public battery data consist of derived summaries and the first chronological week of
+schedules. Full-series schedules and full predictions stay Git-ignored. The same JEPX
+attribution and data-rights exclusions apply. This extension uses ordinary commits on
+battery-optimization, with no history rewrite or force push.
