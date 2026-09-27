@@ -17,7 +17,7 @@ to **JEPX half-hourly system prices**. It implements three naive baselines and a
 and tests against future leakage. **This is a simplified adaptation, not a paper reproduction.**
 
 **Executed:** official JEPX fiscal 2022–2024 data; test delivery dates
-2024-04-01–2025-03-31. **Local software checks: 25 tests passed.**
+2024-04-01–2025-03-31. **Software checks: 52 tests passed locally and on GitHub Actions (Python 3.11 / 3.12).**
 
 | Model | MAE (JPY/kWh) | RMSE (JPY/kWh) | rMAE (weekly) |
 |---|---:|---:|---:|
@@ -61,7 +61,7 @@ best practices and an open-access benchmark*. Applied Energy, 293, 116983.
 [published author-hosted PDF](https://jesuslago.com/wp-content/uploads/1-s2.0-S0306261921004529-main-1.pdf).
 
 Read [Paper notes](docs/PAPER_NOTES.md) for section references and explicit
-**Paper / This implementation** distinctions. No third-party forecasting repository source code was intentionally used as an implementation reference or copied during this project. scikit-learn supplies the optimizer;
+**Paper / This implementation** distinctions. No third-party forecasting repository source code was intentionally used as an implementation reference or copied during this project. scikit-learn supplies the LASSO optimizer;
 data handling, feature design, evaluation and reporting are implemented here.
 
 ## What I implemented
@@ -243,6 +243,7 @@ redistribution policy separately before committing them. Defaults reproduce the 
 
 ```text
 src/jepx_forecasting/  data, features, splits, baseline, lear, metrics, pipeline
+                      battery, optimization, backtest
 scripts/              optional download/prepare and experiment entry points
 tests/                pytest checks using synthetic fixtures only
 docs/                 paper, methodology, results, interview, future work, publishing
