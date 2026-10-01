@@ -1,278 +1,157 @@
-# JEPX Electricity Price Forecasting from Academic Literature
+# JEPX price forecasting and battery scheduling
 
-**Two-stage research portfolio:** Stage 1 — JEPX electricity price forecasting;
-Stage 2 — forecast-driven battery scheduling and optimization.
-The unchanged forecasts now feed a constrained MILP, followed by actual-price
-out-of-sample valuation. [Battery method](docs/BATTERY_OPTIMIZATION.md) ·
-[Executed battery results](docs/BATTERY_RESULTS.md).
+[日本語](README.ja.md) · [Technical documentation](docs/README.md) · [Design decisions](docs/DESIGN_DECISIONS.md)
 
+## Project overview
 
-[日本語](README.ja.md) · [Methodology](docs/METHODOLOGY.md) · [Results](docs/RESULTS.md) · [Paper notes](docs/PAPER_NOTES.md)
+A Python study connecting electricity price forecasting to constrained battery
+scheduling. Stage 1 adapts the LEAR-style LASSO approach discussed by
+[Lago et al. (2021)](https://doi.org/10.1016/j.apenergy.2021.116983) to JEPX half-hourly
+system prices. Stage 2 uses those frozen forecasts to choose charge/discharge
+schedules, then evaluates them at actual prices.
 
-[![Tests](https://github.com/Fuku1121/jepx-electricity-price-forecasting/actions/workflows/tests.yml/badge.svg)](https://github.com/Fuku1121/jepx-electricity-price-forecasting/actions/workflows/tests.yml)
+The dataset covers fiscal years 2022–2024. Both stages use the same 365-day test
+period, **2024-04-01–2025-03-31**. This is a simplified adaptation of the paper.
 
-An independent, AI-assisted Python study adapting ideas from **Lago et al. (2021)**
-to **JEPX half-hourly system prices**. It implements three naive baselines and a
-48-output LEAR-style LASSO, with chronological validation, daily recalibration,
-and tests against future leakage. **This is a simplified adaptation, not a paper reproduction.**
+## Research question
 
-**Executed:** official JEPX fiscal 2022–2024 data; test delivery dates
-2024-04-01–2025-03-31. **Software checks: 52 tests passed locally and on GitHub Actions (Python 3.11 / 3.12).**
+1. Can price-history-based LASSO improve next-day forecasts over simple persistence baselines?
+2. Does that improvement translate into higher battery cashflow under the same physical constraints?
 
-| Model | MAE (JPY/kWh) | RMSE (JPY/kWh) | rMAE (weekly) |
-|---|---:|---:|---:|
-| naive_previous_day | 1.8547 | 2.9903 | 0.7011 |
-| naive_week | 2.6453 | 3.9525 | 1.0000 |
-| naive_weekday | 1.8981 | 2.9987 | 0.7175 |
-| lear_lasso | 1.5581 | 2.2918 | 0.5890 |
+## Main results
 
-The LEAR-style model reduced MAE by **0.2967 JPY/kWh (16.00%)** against the strongest tested naive baseline, previous-day persistence. This is a descriptive result for one test year,
-not evidence of statistical significance, general superiority or trading profitability.
+Stage 1 evaluates 17,520 half-hour observations. Units are JPY/kWh.
 
-![Test MAE comparison](results/figures/model_mae.png)
+| Model | MAE | RMSE |
+|---|---:|---:|
+| Previous-day naive | 1.8547 | 2.9903 |
+| Previous-week naive | 2.6453 | 3.9525 |
+| Weekday-aware naive | 1.8981 | 2.9987 |
+| LEAR-style LASSO | **1.5581** | **2.2918** |
 
-## Review guide
-
-| To review | Start here |
-|---|---|
-| Research question and measured outcome (Japanese) | [日本語の概要](README.ja.md) |
-| Paper interpretation and deliberate simplifications | [Paper notes](docs/PAPER_NOTES.md) |
-| Forecast timing, splits and leakage safeguards | [Methodology](docs/METHODOLOGY.md) |
-| Full comparison, failure cases and evidence | [Results](docs/RESULTS.md) |
-| Implementation and tests | [Source](src/jepx_forecasting/) · [Tests](tests/) |
-| Reproduce the experiment | [Instructions below](#reproduction) · [Data acquisition](data/README.md) |
-
-Study materials and the Japanese delivery report are indexed in [docs/README.md](docs/README.md).
-
-## Motivation
-
-The paper emphasizes fair comparisons and reproducible evaluation, making it a useful
-starting point for connecting academic methods to a different electricity market.
-This project focuses on the complete research workflow: literature interpretation,
-information availability, data validation, independent implementation, and honest reporting.
-
-## Paper
-
-Lago, J., Marcjasz, G., De Schutter, B., & Weron, R. (2021).
-*Forecasting day-ahead electricity prices: A review of state-of-the-art algorithms,
-best practices and an open-access benchmark*. Applied Energy, 293, 116983.
-[DOI](https://doi.org/10.1016/j.apenergy.2021.116983) ·
-[arXiv](https://arxiv.org/abs/2008.08004) ·
-[published author-hosted PDF](https://jesuslago.com/wp-content/uploads/1-s2.0-S0306261921004529-main-1.pdf).
-
-Read [Paper notes](docs/PAPER_NOTES.md) for section references and explicit
-**Paper / This implementation** distinctions. No third-party forecasting repository source code was intentionally used as an implementation reference or copied during this project. scikit-learn supplies the LASSO optimizer;
-data handling, feature design, evaluation and reporting are implemented here.
-
-## What I implemented
-
-The repository contains strict official-CSV ingestion, lagged daily feature generation,
-chronological splits, training-only scaling, daily LASSO recalibration, validation-only
-alpha selection, three baselines, aligned metrics, figures and provenance records.
-Unit tests include current/future-target mutation, unknown-target inference,
-training-scaler checks and complete pipeline execution. AI assistance is disclosed in the [authorship statement](#ai-assistance).
-
-## Dataset
-
-Source: **Japan Electric Power Exchange (JEPX)**,
-[official spot market data](https://www.jepx.jp/electricpower/market-data/spot/).
-Target: **system price / システムプライス(円/kWh)**, not Tokyo area price.
-
-Fiscal-year CSVs cover 2022-04-01–2025-03-31: 1,096 complete days,
-52,608 observations, 48 slots/day, JPY/kWh, Asia/Tokyo.
-Duplicates, missing dates/slots and nonfinite prices cause errors rather than interpolation.
-The first seven days supply lag history. Final historical archives are not as-of snapshots.
-
-[Data instructions and use conditions](data/README.md) explain manual and optional
-form-based downloads. Raw/processed series and full prediction outputs are Git-ignored;
-JEPX data are not relicensed under MIT. Figures and the short sample are derived from
-JEPX data; source attribution applies to every results artifact.
+LASSO reduced MAE by **16.00%** against the strongest naive baseline, but lost to
+it on **156 of 365 days**. Its 54 predictions below 0.01 JPY/kWh were retained
+without clipping. [Full results and failure cases](docs/RESULTS.md) ·
+[Metrics CSV](results/metrics.csv).
 
 ## Method
 
-Naive models copy the previous day, previous week, or previous day on Tuesday–Friday
-and previous week on Saturday–Monday. The LEAR-style variant estimates one regression
-per half-hour slot using **StandardScaler + Lasso**, minimizing squared error plus
-an L1 coefficient penalty. Output regressions are independent, with a shared alpha.
+- **Data:** official JEPX system prices; 1,096 days and 52,608 observations.
+- **Features:** 247 columns combining lagged daily price curves, seven-day
+  per-slot statistics and weekday indicators.
+- **Model:** 48 independent LASSO outputs with training-only standardization.
+- **Evaluation:** chronological train/validation/test split; validation-only
+  selection of alpha = 0.1; daily expanding-window refits with alpha fixed in test.
+- **Checks:** future-price mutation tests, aligned observations and strict data
+  validation. **52 tests passed** locally and on GitHub Actions, Python 3.11/3.12.
 
-The full d−1 auction curve is assumed known before the auction for d because it was
-priced on d−2. This is an auction-price assumption, not permission to use future actual
-load or intraday prices. See [Methodology](docs/METHODOLOGY.md).
+The earlier delivery day's auction curve is assumed available at forecast time.
+See [methodology and leakage safeguards](docs/METHODOLOGY.md),
+[paper-to-implementation differences](docs/PAPER_NOTES.md), and
+[design decisions](docs/DESIGN_DECISIONS.md).
 
-## Features
+## Stage 2: Battery optimization
 
-247 daily columns: full 48-slot curves from d−1, d−2 and d−7; seven-day per-slot
-means and standard deviations using only d−7,...,d−1; seven weekday indicators.
-Slot identity is implicit in the separate target regressions. Weekend is represented
-by Saturday/Sunday indicators. No actual future prices, demand or generation are used.
+A SciPy/HiGHS MILP turns forecast prices into a daily schedule. The hypothetical
+battery has **1 MWh** capacity, **0.5 MW** charge/discharge limits, 10–90% SOC,
+50% initial and terminal SOC, and 95% efficiency each way (90.25% round trip).
+Binary operating states prevent simultaneous charging and discharging.
 
-## Evaluation
+Operational plans are frozen before actual-price evaluation. A separate
+**Perfect-foresight upper bound** uses future prices as an infeasible benchmark.
+Base-case annual proxy cashflows, with zero degradation cost:
 
-| Partition | Delivery dates | Days |
-|---|---|---:|
-| Initial usable training | 2022-04-08–2023-12-31 | 633 |
-| Validation | 2024-01-01–2024-03-31 | 91 |
-| Test | 2024-04-01–2025-03-31 | 365 |
-
-The grid `[0.03, 0.1, 0.3, 1.0]` and dates were specified before test metrics.
-Daily expanding-window validation selected **alpha = 0.1** by MAE.
-Alpha is then fixed; scaling and coefficients are fitted anew each test day using
-only earlier target dates. This sequential evaluation is not a fixed-origin annual
-forecast. Earlier test-day auction outcomes may enter later daily fits.
-
-All models share 17,520 test observations. MAE is primary,
-RMSE is secondary, and rMAE uses the weekly naive error on the same test observations.
-No random splitting, MAPE, post-hoc clipping or removal of difficult days is used.
-
-## Results
-
-The table above comes from [metrics.csv](results/metrics.csv).
-[Detailed results](docs/RESULTS.md) include differences against every baseline and
-limitations. [Run metadata](results/run_metadata.json), [validation scores](results/validation_scores.csv),
-[daily fitting audit](results/fit_audit.csv) and [daily MAE](results/daily_mae.csv)
-make the experiment traceable. The full predictions remain local; the committed
-[first-week sample](results/predictions_sample.csv) alone cannot reproduce annual metrics.
-
-![Actual versus predicted, first test week](results/figures/actual_vs_predicted.png)
-
-![Error by delivery slot](results/figures/slot_errors.png)
-
-LASSO was worse than the previous-day baseline on 156/365 individual days and
-produced 54 forecasts below 0.01 JPY/kWh; these were retained without clipping.
-See the documented failure cases before interpreting the annual average.
-
-The shaded error band is a descriptive 10th–90th percentile range, not a confidence interval.
-
-## Differences from the paper
-
-| Paper | This implementation |
-|---|---|
-| Five European/US hourly markets | One Japanese market; half-hourly system prices |
-| Price lags 1, 2, 3, 7 and external forecast curves | Lags 1, 2, 7; rolling statistics; no external forecasts |
-| Robust scaling and asinh price transformation | Training-only StandardScaler on X; untransformed y |
-| Daily LARS/AIC penalty selection and coordinate descent | Shared alpha selected once on chronological validation |
-| Several fixed calibration windows and ensembles | One daily expanding window; optional rolling window |
-| LEAR and DNN benchmarks, two-year tests, DM/GW comparisons | LASSO and naive models, one-year test, descriptive comparisons |
-
-## Battery optimization
-
-**Research question:** does LEAR-driven battery scheduling improve realized proxy
-revenue over the strongest existing naive forecast, under identical constraints?
-This decision layer reuses Stage 1 forecasts without changing model, split or results.
-
-**Hypothetical research battery:** 1 MWh nameplate, 0.5 MW charge/discharge,
-10–90% SOC, fixed 50% start/end each day, 95% efficiency each way (90.25% round trip).
-This user-proposed teaching case makes units and loss/energy constraints explicit;
-it is not a fitted real installation. The base case has zero degradation cost.
-
-**Optimization:** a SciPy/HiGHS MILP maximizes forecast price × net discharge energy
-minus optional grid-side throughput cost. It enforces SOC dynamics, capacity/output
-bounds and a binary charge/discharge state. MW × 0.5 h × 1000 converts to kWh.
-Plans use forecasts only and are frozen before actual-price settlement; the oracle
-has a separate function. A failed solver raises, rather than silently producing results.
-
-**Backtest:** all 365 original test days (2024-04-01–2025-03-31), 48 slots/day.
-No-operation, previous-day naive, LEAR, and the explicitly infeasible oracle share
-battery conditions. Naive was chosen from the existing Stage 1 MAE ranking at the
-user's request; no battery-return selection or test-period battery tuning was done.
-
-| Strategy | Annual proxy net revenue (JPY) | Negative days |
+| Strategy | JPY | Negative days |
 |---|---:|---:|
 | No-operation | 0 | 0 |
-| Naive forecast optimization | 2,233,270 | 8 |
-| LEAR forecast optimization | 2,532,089 | 2 |
+| Previous-day naive forecast | 2,233,270 | 8 |
+| LEAR forecast | **2,532,089** | 2 |
 | Perfect-foresight upper bound | 2,899,726 | 0 |
 
-LEAR exceeds Naive by **298,819 JPY (+13.38%)** in the base case, but earns less on
-**112 days**. On **43 days**, its MAE is lower yet its revenue is also lower.
-**Lower forecast error does not automatically imply higher operational value.**
-Six predeclared cases (base, RTE 80/90/95%, throughput cost 1/3 JPY/kWh) are all
-reported in [Battery results](docs/BATTERY_RESULTS.md), including losses.
+LEAR improved the annual proxy cashflow by **298,819 JPY (+13.38%)**, but
+underperformed Naive on **112 days**. All six fixed sensitivity cases are reported:
+base, round-trip efficiencies 80/90/95%, and throughput costs 1/3 JPY/kWh.
 
-![Cumulative battery proxy revenue](results/battery/figures/cumulative_revenue.png)
+[Formulation and reproduction](docs/BATTERY_OPTIMIZATION.md) ·
+[Results, downside and all sensitivity cases](docs/BATTERY_RESULTS.md).
 
-This is a **JEPX system-price research proxy**; an actual battery may settle on area prices or different contracts. Grid fees, imbalance costs, market impact, bid acceptance, transmission constraints, capex and fixed operating costs are omitted. All planned volumes are assumed executable. Degradation is only a hypothetical linear throughput charge, not a lifetime model. Battery parameters are hypothetical. Perfect foresight is infeasible in practice. These revenues do **not** demonstrate commercial operation or profitability.
+## Key findings
 
-See [equations, assumptions and reproduction](docs/BATTERY_OPTIMIZATION.md).
-After preparing the full Stage 1 prediction file, run:
+- Previous-day persistence was the strongest simple baseline; LASSO's annual
+  advantage did not mean winning every day.
+- On **43 days**, LEAR had lower MAE but lower battery revenue than Naive.
+  **Lower forecast error does not automatically imply higher operational value.**
+- The mutation tests check two information boundaries: future targets cannot
+  affect an earlier forecast, and actual settlement prices cannot change a frozen plan.
+- System-price cashflows alone are insufficient to assess an operating battery.
 
-```bash
-python scripts/run_battery_backtest.py --predictions results/predictions_full.csv
-```
+## Limitations
 
-## What I learned
+One market and one test year support a descriptive comparison, not a general
+performance or significance claim. External forecasts, holiday features and
+publication-time data snapshots are absent. The battery comparison reuses the
+Stage 1 test-MAE baseline ranking and fixes daily terminal SOC.
 
-The implemented checks illustrate why delivery time and information availability must
-be distinguished, why scaling belongs inside each fit, and why simple baselines are
-necessary. Mutation tests demonstrate the code's causal feature construction; they
-cannot establish historical publication timestamps. LASSO makes a large lag set
-manageable, but a selected coefficient is not a causal explanation. A measured error
-difference does not by itself establish economic value. The [Japanese study notes](docs/INTERVIEW_NOTES.md) explain these concepts with examples.
+Battery values are **hypothetical system-price proxies**, not commercial profit.
+Actual settlement may use area prices. Grid fees, imbalance costs, market impact,
+bid acceptance, transmission constraints, capex and fixed operating costs are
+omitted; degradation is a simplified throughput charge. Perfect foresight is
+unavailable in practice. [Remaining work](docs/FUTURE_WORK.md).
 
 ## Reproduction
 
-Python 3.11+; run from this repository's root. Commands use a virtual environment;
-on Windows replace `source .venv/bin/activate` with `.venv\Scripts\Activate.ps1`.
+Python 3.11+. From the repository root:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 python -m pytest -q
-# Optional automatic download; manual instructions are in data/README.md
+# Obtain official CSVs first; see data/README.md.
 python scripts/download_or_prepare_data.py --download-years 2022 2023 2024
-python scripts/run_experiment.py
+python scripts/run_experiment.py --output results/stage1_reproduction
+python scripts/run_battery_backtest.py --predictions results/stage1_reproduction/predictions_full.csv
 ```
 
-If CSVs are already present, run `python scripts/download_or_prepare_data.py` without
-download arguments. The run script revalidates raw files and produces the result
-CSVs/figures; it does not require the prepared daily.csv. A full run may take several
-minutes depending on hardware. No credentials are required for public data.
-
-For the recorded dependency versions, first install
-`python -m pip install -r requirements-lock.txt`, then
-`python -m pip install --no-deps -e .`. The lock records the Windows/Python
-3.12.14 run; it is not a promise of bitwise equality on every platform.
-Compare raw file hashes in metadata before expecting equal outputs.
-
-To use a rolling window, supply `--window-days 365 --output results/rolling_local`.
-That is a new experiment, not the published main result; review its artifacts and
-redistribution policy separately before committing them. Defaults reproduce the main run.
+On Windows activate with `.venv\Scripts\Activate.ps1`. Use the
+[data instructions](data/README.md) for manual downloads. The separate Stage 1
+output directory preserves published evidence. Raw data, full predictions and
+full schedules stay Git-ignored. Recorded versions are in `requirements-lock.txt`;
+[reproduction details](docs/BATTERY_OPTIMIZATION.md#reproduction--再現) cover input
+checks and platform differences.
 
 ## Repository structure
 
 ```text
-src/jepx_forecasting/  data, features, splits, baseline, lear, metrics, pipeline
-                      battery, optimization, backtest
-scripts/              optional download/prepare and experiment entry points
-tests/                pytest checks using synthetic fixtures only
-docs/                 paper, methodology, results, interview, future work, publishing
-results/              executed metrics, audits, small sample and figures
-data/                 instructions; ignored local raw and processed CSVs
-.github/workflows/    push/PR tests and import checks
+src/jepx_forecasting/  forecasting, battery model, MILP and backtest
+scripts/              data preparation and experiment entry points
+configs/              fixed battery experiment design
+tests/               synthetic checks for both stages
+docs/                methodology, results and design decisions
+results/              Stage 1 evidence and battery/ outputs
 ```
 
-## Limitations
+## Project ownership
 
-This is not a full LEAR reproduction or a production trading system. One test year
-and one market do not establish stability across regimes. External forecasts, Japanese
-holidays, robust target transformations, uncertainty estimates and significance tests
-are absent. Expanding history can preserve outdated regimes. Shared alpha simplifies
-slot-specific tuning. Archive revisions and original release timing are not reconstructed.
-System price is not automatically an area's executable battery settlement price.
-Stage 2 now implements the [battery scheduling experiment](docs/BATTERY_OPTIMIZATION.md);
-[remaining future work](docs/FUTURE_WORK.md) concerns execution realism and uncertainty.
+The author set the project brief: apply the cited electricity-price literature to
+JEPX, compare against naive forecasts using chronological evaluation, and extend
+the study to forecast-driven battery decisions. The author also required that
+unfavorable results and the original experiments be preserved.
 
-## AI assistance
+[Design decisions](docs/DESIGN_DECISIONS.md) distinguishes these instructions from
+implementation choices and rationales still awaiting the author's confirmation.
+[Development workflow](docs/DEVELOPMENT.md) describes how future decisions will be recorded.
 
-Codex was used for literature interpretation support, implementation, code review,
-testing and documentation. This is an AI-assisted implementation, not a claim of unaided authorship.
-The author remains responsible for reviewing the paper interpretation, experimental
-decisions, implementation and conclusions. Authorship does not imply endorsement
-by the paper authors or JEPX.
+## AI-assisted development
 
-## License
+Codex supported literature interpretation, implementation, code review, test
+development, result analysis and documentation editing. Suggestions were checked
+where applicable against referenced literature, source data, code execution and
+tests; the corresponding evidence is linked in the technical documents.
 
-Original code and documentation: [MIT](LICENSE). JEPX source data and the cited
-paper retain their own rights. See [pre-publication review](docs/RELEASE_REVIEW.md)
-for data exclusions and provenance checks. The Tests link leads to the current hosted CI status.
+The author directs project scope and is responsible for reviewing the work.
+This disclosure does not attribute every implementation choice or interpretation
+to the author; personal review and rationale should be confirmed in the decision record.
+
+Original code and documentation: [MIT](LICENSE). JEPX data and the cited paper
+retain their own rights. [Data-use and provenance review](docs/RELEASE_REVIEW.md).

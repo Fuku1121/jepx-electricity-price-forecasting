@@ -10,13 +10,15 @@
 - [Future work](FUTURE_WORK.md): remaining execution and uncertainty questions.
 - [Release review](RELEASE_REVIEW.md): data exclusions, provenance and publication checks.
 
-## Japanese study materials
+## Project context
 
 - [Project overview](../README.ja.md): concise research and implementation summary.
-- [Interview notes](INTERVIEW_NOTES.md): definitions, examples and questions for independent study.
 - [Delivery report](FINAL_REPORT_JA.md): the original project's fourteen reporting items.
+
+- [Design decisions](DESIGN_DECISIONS.md): documented rationale, trade-offs and author confirmation items.
 
 ## Maintenance
 
+- [Development workflow](DEVELOPMENT.md): traceable future decisions, experiments and PRs.
 - [Publication and updates](PUBLISHING.md): repository location and safe update workflow.
 - [Data acquisition](../data/README.md): official downloads and data-use conditions.
