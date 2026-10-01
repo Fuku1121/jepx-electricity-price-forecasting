@@ -106,4 +106,3 @@ Record corrections and confirmation dates in future commits; do not invent earli
 **Evidence:** [Methodology: data contract](METHODOLOGY.md#data-contract); [Battery limitations](BATTERY_RESULTS.md).
 
 **TODO(author):** confirm the economic interpretation and which missing assumption you would investigate next; no personal priority is invented.
-
