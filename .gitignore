@@ -23,3 +23,7 @@ results/rolling_local/
 
 results/battery/battery_schedules_full.csv
 results/stage1_reproduction/
+
+# Personal study material is not a public research artifact.
+private_notes/
+docs/INTERVIEW_NOTES.md
